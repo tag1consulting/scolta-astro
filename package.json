@@ -36,23 +36,19 @@
     },
     "./routes/expand-query": {
       "types": "./dist/routes/expand-query.d.ts",
-      "import": "./dist/routes/expand-query.js",
-      "require": "./dist/routes/expand-query.cjs"
+      "default": "./dist/routes/expand-query.js"
     },
     "./routes/summarize": {
       "types": "./dist/routes/summarize.d.ts",
-      "import": "./dist/routes/summarize.js",
-      "require": "./dist/routes/summarize.cjs"
+      "default": "./dist/routes/summarize.js"
     },
     "./routes/followup": {
       "types": "./dist/routes/followup.d.ts",
-      "import": "./dist/routes/followup.js",
-      "require": "./dist/routes/followup.cjs"
+      "default": "./dist/routes/followup.js"
     },
     "./routes/health": {
       "types": "./dist/routes/health.d.ts",
-      "import": "./dist/routes/health.js",
-      "require": "./dist/routes/health.cjs"
+      "default": "./dist/routes/health.js"
     },
     "./ScoltaSearch.astro": "./ScoltaSearch.astro",
     "./package.json": "./package.json"
