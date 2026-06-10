@@ -1,0 +1,35 @@
+---
+/**
+ * <ScoltaSearch /> — mounts the shared vanilla-JS search widget (`scolta.js`,
+ * reused verbatim by every binding — Drupal and WordPress use it too, so there
+ * is no Astro-specific search logic). Renders the container the widget hydrates
+ * into, sets `window.scolta` from the SAVED browser config (the `container` and
+ * `wasmPath` keys are mandatory — scolta.js auto-init silently bails without
+ * them), and loads the stylesheet + widget module from the vendored assets.
+ * Works without any client framework: the bootstrap is a plain inline script.
+ */
+import { buildWindowScolta } from "./dist/bootstrap.js";
+
+interface Props {
+  /** Resolved browser config (e.g. `AstroScoltaConfig#toBrowserConfig()`). */
+  config: Record<string, unknown>;
+  /** Public path the vendored assets serve under (`scolta-build assets`). */
+  assetsPath?: string;
+  /** Pagefind runtime path, e.g. "/pagefind/pagefind.js". */
+  pagefindPath?: string;
+  /** DOM id of the mount container. */
+  containerId?: string;
+}
+
+const { config, assetsPath = "/scolta", pagefindPath, containerId = "scolta-search" } = Astro.props;
+const base = assetsPath.replace(/\/$/, "");
+const windowScolta = buildWindowScolta(config, { assetsPath, pagefindPath, containerId });
+---
+
+<div id={containerId} data-scolta-search></div>
+<link rel="stylesheet" href={`${base}/css/scolta.css`} data-scolta />
+<script is:inline define:vars={{ windowScolta }}>
+  // Classic inline script: runs during parse, before the deferred widget module.
+  window.scolta = windowScolta;
+</script>
+<script type="module" src={`${base}/js/scolta.js`} data-scolta is:inline></script>
