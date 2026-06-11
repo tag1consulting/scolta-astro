@@ -18,7 +18,9 @@ declare global {
 // app) is evaluated once on first load and then cached. An explicit non-amazee
 // provider with no key keeps the AI path deterministic and offline: expansion
 // degrades to the original query instead of provisioning a trial.
-globalThis.__SCOLTA_ASTRO_TEST_OPTIONS__ = { ai_provider: "anthropic", ai_api_key: "", results_per_page: 7 };
+// healthDetail: true — the health round-trip below asserts on scoring detail,
+// which the status-only default (the policy for public endpoints) would trim.
+globalThis.__SCOLTA_ASTRO_TEST_OPTIONS__ = { ai_provider: "anthropic", ai_api_key: "", results_per_page: 7, healthDetail: true };
 
 const expandQuery = await import("../src/routes/expand-query.js");
 const summarize = await import("../src/routes/summarize.js");

@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Changed
+- **The health route now returns status-only by default.**
+  `GET /api/scolta/v1/health` previously exposed the full diagnostic payload
+  (AI provider, configured flags, index state, scoring config) to every
+  caller. Monitoring endpoints keep working: the route still answers HTTP 200
+  with `{"status": "ok"|"degraded"}`, computed from the full report so
+  degradation stays visible. The detail moved behind the new `healthDetail`
+  option (default `false`, settable via integration options or
+  `scolta.config.mjs`); there is no user model in a headless stack, so detail
+  is config-gated rather than auth-gated. Matches the status-only anonymous
+  shape of the PHP-family and Django adapters.
+
 ## [1.0.0]
 
 - Initial Astro integration: injected AI server routes at

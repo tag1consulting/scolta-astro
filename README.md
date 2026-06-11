@@ -56,6 +56,15 @@ Route handlers resolve config per request, lowest to highest precedence:
 3. the `SCOLTA_API_KEY` / `SCOLTA_AI_PROVIDER` / `SCOLTA_AI_MODEL` /
    `SCOLTA_AI_BASE_URL` environment variables.
 
+## Health endpoint
+
+`GET /api/scolta/v1/health` returns `{"status": "ok"|"degraded"}` — enough for
+uptime monitors. The full diagnostic payload (provider, index state, scoring
+config) is exposed only with `healthDetail: true` in the integration options
+(or `scolta.config.mjs`). There is no user model in a headless stack, so
+detail is config-gated rather than auth-gated; enable it only where the
+endpoint is not publicly reachable.
+
 ## Content modes
 
 - **`static-export`** (default) — after a static `astro build`,

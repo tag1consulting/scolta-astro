@@ -19,6 +19,13 @@ export interface AstroScoltaConfigInit extends Record<string, unknown> {
   assetsPublicPath?: string;
   autoRebuild?: boolean;
   autoRebuildDelay?: number;
+  /**
+   * Expose the full diagnostic payload on GET /health. Default false: every
+   * caller gets {"status": ...} only — enough for uptime monitors. There is
+   * no user model in a headless stack, so detail is config-gated, not
+   * auth-gated; enable it only where the endpoint is not publicly reachable.
+   */
+  healthDetail?: boolean;
 }
 
 export class AstroScoltaConfig {
@@ -30,6 +37,7 @@ export class AstroScoltaConfig {
   readonly assetsPublicPath: string;
   readonly autoRebuild: boolean;
   readonly autoRebuildDelay: number;
+  readonly healthDetail: boolean;
 
   constructor(init: AstroScoltaConfigInit = {}) {
     this.scolta = ScoltaConfig.fromObject(init);
@@ -43,6 +51,7 @@ export class AstroScoltaConfig {
     this.assetsPublicPath = init.assetsPublicPath ?? "/scolta";
     this.autoRebuild = init.autoRebuild ?? false;
     this.autoRebuildDelay = init.autoRebuildDelay ?? 2000;
+    this.healthDetail = init.healthDetail ?? false;
   }
 
   static fromObject(init: AstroScoltaConfigInit = {}): AstroScoltaConfig {
