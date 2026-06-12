@@ -5,6 +5,7 @@
 
 import { AstroScoltaConfig } from "../config.js";
 import { loadConfigObject } from "../config-loader.js";
+import { createScoltaApi, type ScoltaApi } from "../handlers.js";
 import { loadIntegrationOptions } from "../options.js";
 
 export interface EndpointResultLike {
@@ -25,6 +26,23 @@ export async function resolveRequestConfig(root: string = process.cwd()): Promis
   const fileConfig = await loadConfigObject(root);
   const integrationOptions = await loadIntegrationOptions();
   return AstroScoltaConfig.fromEnv({ ...fileConfig, ...integrationOptions });
+}
+
+// The config layers (file < integration options < env) are fixed for the
+// lifetime of the server process, so the resolved config + API construction
+// happens once per project root, not once per request. resolveRequestConfig
+// itself stays unmemoized — it is the precedence primitive (and what the
+// precedence tests pin); this cache sits above it.
+const apiCache = new Map<string, Promise<ScoltaApi>>();
+
+/** The ScoltaApi for a project root — resolved and constructed once. */
+export function useScoltaApi(root: string = process.cwd()): Promise<ScoltaApi> {
+  let api = apiCache.get(root);
+  if (!api) {
+    api = resolveRequestConfig(root).then((config) => createScoltaApi(config));
+    apiCache.set(root, api);
+  }
+  return api;
 }
 
 /** Parse a JSON request body, tolerating absent/invalid bodies. */

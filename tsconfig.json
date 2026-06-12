@@ -7,6 +7,7 @@
     "types": ["node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
@@ -17,6 +18,6 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "tests-mount"],
   "exclude": ["dist", "node_modules", "examples"]
 }

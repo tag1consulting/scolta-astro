@@ -12,8 +12,9 @@ import type { AstroScoltaConfigInit } from "./config.js";
 export async function loadConfigObject(root: string): Promise<AstroScoltaConfigInit> {
   for (const name of ["scolta.config.mjs", "scolta.config.js"]) {
     try {
-      const mod = await import(pathToFileURL(path.join(root, name)).href);
-      const obj = mod.default ?? mod.config ?? mod;
+      const mod: unknown = await import(pathToFileURL(path.join(root, name)).href);
+      const m = mod as { default?: unknown; config?: unknown };
+      const obj = m.default ?? m.config ?? mod;
       if (obj && typeof obj === "object") return obj as AstroScoltaConfigInit;
     } catch {
       // fall through to env-only

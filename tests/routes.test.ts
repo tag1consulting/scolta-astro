@@ -52,7 +52,7 @@ describe("raw payload contract", () => {
   });
 
   it("expand-query tolerates a missing body", async () => {
-    const res = await expandQuery.POST({ request: new Request("http://localhost/x", { method: "POST" }) } as any);
+    const res = await expandQuery.POST({ request: new Request("http://localhost/x", { method: "POST" }) });
     expect([200, 400]).toContain(res.status);
     expect("data" in (await res.json())).toBe(false);
   });
@@ -77,12 +77,21 @@ describe("raw payload contract", () => {
   });
 
   it("health answers 200 JSON reflecting the integration options", async () => {
-    const res = await health.GET({ request: new Request("http://localhost/api/scolta/v1/health") } as any);
+    const res = await health.GET({ request: new Request("http://localhost/api/scolta/v1/health") });
     expect(res.status).toBe(200);
     const json = await res.json();
     // results_per_page: 7 came in through the virtual options module — the
     // round-trip proof that scoltaAstro() options reach the served config.
     expect(json.scoring.RESULTS_PER_PAGE).toBe(7);
+  });
+});
+
+describe("useScoltaApi memoization", () => {
+  it("two calls under the same root return the same instance", async () => {
+    const { useScoltaApi } = await import("../src/routes/util.js");
+    const first = await useScoltaApi();
+    const second = await useScoltaApi();
+    expect(second).toBe(first);
   });
 });
 

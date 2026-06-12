@@ -47,8 +47,8 @@ export default function scoltaAstro(options: AstroScoltaConfigInit = {}): AstroI
   return {
     name: "scolta-astro",
     hooks: {
-      "astro:config:setup"({ injectRoute, updateConfig }) {
-        updateConfig({
+      "astro:config:setup"(ctx) {
+        ctx.updateConfig({
           vite: {
             plugins: [scoltaOptionsPlugin(options)],
             // Force this package through Vite so the virtual options import in
@@ -61,7 +61,7 @@ export default function scoltaAstro(options: AstroScoltaConfigInit = {}): AstroI
         for (const route of SCOLTA_ROUTES) {
           // The AI endpoints are request-time routes (POST + health probe);
           // never prerender them, even under static output.
-          injectRoute({ pattern: route.pattern, entrypoint: route.entrypoint, prerender: false });
+          ctx.injectRoute({ pattern: route.pattern, entrypoint: route.entrypoint, prerender: false });
         }
       },
     },

@@ -8,7 +8,7 @@ function runConfigSetup(options: Record<string, unknown>) {
   const updates: any[] = [];
   const integration = scoltaAstro(options);
   expect(integration.name).toBe("scolta-astro");
-  integration.hooks["astro:config:setup"]!({
+  void integration.hooks["astro:config:setup"]!({
     config: {},
     injectRoute: (r: any) => injected.push(r),
     updateConfig: (c: any) => {
