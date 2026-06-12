@@ -14,6 +14,11 @@ export default defineConfig({
     bootstrap: "src/bootstrap.ts",
   },
   format: ["esm", "cjs"],
+  // import.meta.url is empty ({}) in the CJS output without this: the shim
+  // derives it from __filename, so the CLI's direct-invoke detection and
+  // copyAssets source-dir resolution work under the .cjs entry too. Without
+  // it, `node dist/cli.cjs assets` could never run main().
+  shims: true,
   dts: true,
   clean: true,
   sourcemap: true,
