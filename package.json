@@ -5,6 +5,13 @@
   "license": "MIT",
   "author": "Tag1 Consulting <info@tag1.com>",
   "homepage": "https://tag1.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tag1consulting/scolta-astro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tag1consulting/scolta-astro/issues"
+  },
   "keywords": [
     "search",
     "ai",
@@ -20,19 +27,34 @@
   "types": "./dist/integration.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/integration.d.ts",
-      "import": "./dist/integration.js",
-      "require": "./dist/integration.cjs"
+      "import": {
+        "types": "./dist/integration.d.ts",
+        "default": "./dist/integration.js"
+      },
+      "require": {
+        "types": "./dist/integration.d.cts",
+        "default": "./dist/integration.cjs"
+      }
     },
     "./core": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
     },
     "./build": {
-      "types": "./dist/build.d.ts",
-      "import": "./dist/build.js",
-      "require": "./dist/build.cjs"
+      "import": {
+        "types": "./dist/build.d.ts",
+        "default": "./dist/build.js"
+      },
+      "require": {
+        "types": "./dist/build.d.cts",
+        "default": "./dist/build.cjs"
+      }
     },
     "./routes/expand-query": {
       "types": "./dist/routes/expand-query.d.ts",
@@ -64,10 +86,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
-    "test": "vitest run",
+    "build": "tsup && tsup --config tsup.routes.config.ts",
+    "test": "vitest run && vitest run --config vitest.mount.config.ts",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:publish": "publint && attw --pack . --entrypoints . core build"
   },
   "dependencies": {
     "scolta": "^1.0.0"
@@ -76,12 +99,27 @@
     "astro": ">=4"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@eslint/js": "^9.0.0",
+    "@types/jsdom": "^28.0.3",
     "@types/node": "^20.11.0",
+    "astro": "^6.4.6",
     "eslint": "^9.0.0",
+    "jsdom": "^29.1.1",
+    "publint": "^0.3.21",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0",
     "typescript-eslint": "^8.0.0",
     "vitest": "^3.2.6"
+  },
+  "typesVersions": {
+    "*": {
+      "core": [
+        "./dist/core.d.ts"
+      ],
+      "build": [
+        "./dist/build.d.ts"
+      ]
+    }
   }
 }
