@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+- **Pack-content regression guard (`npm run check:pack`).** A new
+  `scripts/check-pack-content.mjs` runs `npm pack --dry-run --json` and asserts
+  every packed path falls under the allowlist of prefixes *derived from this
+  package's own `files` field* (`dist`, `ScoltaSearch.astro`, `README.md`,
+  `CHANGELOG.md`, `LICENSE`, plus npm's always-included `package.json`) — never
+  a hardcoded generic list. Anything outside fails the build with the leaked
+  path printed and a pointer to the filter (package.json's `files`). It also
+  caps the unpacked size at ~2x the measured good artifact (193,084 bytes →
+  400,000-byte cap) to catch the bundled-fixture / stray-binary / 13 MB-zip
+  class of mistake (cf. the scolta-wp 13 MB incident and WP.org dist-cruft
+  flags). Wired into `.github/workflows/ci.yml` after the build step so dist/
+  exists for the dry-run.
+
 ## [1.0.0] - 2026-06-12
 
 First published release.
