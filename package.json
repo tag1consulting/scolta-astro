@@ -90,7 +90,8 @@
     "test": "vitest run && vitest run --config vitest.mount.config.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check:publish": "publint && attw --pack . --entrypoints . core build"
+    "check:publish": "publint && attw --pack . --entrypoints . core build",
+    "check:pack": "node scripts/check-pack-content.mjs"
   },
   "dependencies": {
     "scolta": "^1.0.0"
