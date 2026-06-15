@@ -15,6 +15,14 @@
   flags). Wired into `.github/workflows/ci.yml` after the build step so dist/
   exists for the dry-run.
 
+- **The release workflow now runs the publish-surface guards before
+  `npm publish` (`.github/workflows/release.yml`).** `check:publish` (publint +
+  are-the-types-wrong) and `check:pack` (pack-content allowlist + size cap)
+  gated only `ci.yml` on PRs, never the release workflow that actually
+  publishes — so a tagged commit could ship a tarball the PR gate would have
+  rejected. Both now run after `build`/`test` and before `npm publish`, gating
+  the published tarball the same way CI gates PRs.
+
 ## [1.0.0] - 2026-06-12
 
 First published release.
