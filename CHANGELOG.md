@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Exposed `ScoltaTracker`** — the debounced rebuild-on-content-change helper
+  the `autoRebuild` / `autoRebuildDelay` config knobs configure, matching
+  scolta-next. `touch(key)` records a change and schedules a single debounced
+  rebuild that reuses the token cache (only changed pages re-tokenize);
+  `createScoltaTracker(config)` wires the default `rebuild` to this package's
+  `buildIndex` (`BuildIntent.fresh`, no force), overridable via an explicit
+  `rebuild`. Wire `touch()` to your content events under server/SSR output;
+  static `astro build` / serverless deploys rebuild via CI/webhook. Previously
+  the `autoRebuild`/`autoRebuildDelay` knobs were declared but read by nothing —
+  and the README's "same `ScoltaTracker` pattern as scolta-next" claim was
+  untrue without the helper actually present.
+
 - **Pack-content regression guard (`npm run check:pack`).** A new
   `scripts/check-pack-content.mjs` runs `npm pack --dry-run --json` and asserts
   every packed path falls under the allowlist of prefixes *derived from this

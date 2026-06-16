@@ -29,6 +29,12 @@ output (`output: "server"` + an adapter such as `@astrojs/node`) — a fully
 static site has the same caveat as scolta-next/scolta-nuxt: host the AI
 endpoint externally or run server mode.
 
+> **Node version:** Astro 6 requires Node `>=22.12`; Astro 4/5 on Node 20 is
+> fine. This package declares `engines.node >=20` so Astro 4/5 users aren't
+> blocked — but npm checks the package's *own* engines, not the peer's, so an
+> Astro-6-on-Node-20 install hits Astro's own engine refusal rather than a
+> pointer from here.
+
 ## Component
 
 Astro has no global component registration; import the search component where
@@ -83,5 +89,25 @@ npx scolta-build assets     # copy runtime assets into the output dir
 
 ## Auto-rebuild
 
-The same `ScoltaTracker` debounce pattern as scolta-next (gated on
-`autoRebuild`); serverless deployments should trigger rebuilds via webhook/CI.
+`ScoltaTracker` is the debounced rebuild helper the `autoRebuild` /
+`autoRebuildDelay` config knobs configure — exported from `scolta-astro`, the
+same helper [`scolta-next`](../scolta-next) ships. Wire `touch(key)` to your
+content-change events and it schedules a single debounced rebuild that reuses
+the token cache, so only changed pages re-tokenize:
+
+```ts
+import { createScoltaTracker, AstroScoltaConfig } from "scolta-astro";
+
+const config = AstroScoltaConfig.fromEnv({ autoRebuild: true, source: "content" });
+const tracker = createScoltaTracker(config, { source: mySource });
+
+// from a CMS save / content webhook handler:
+tracker.touch(`articles:${id}`);
+```
+
+`createScoltaTracker(config)` defaults `rebuild` to this package's `buildIndex`
+(`BuildIntent.fresh`, no force); pass your own `rebuild` to override it. The
+in-process debounce needs a long-running process — it works under server/SSR
+output (`output: "server"`), but a fully static `astro build` or a serverless
+deploy has no shared in-process timer, so trigger rebuilds via webhook/CI there.
+scolta-next's Payload `afterChange`/`afterDelete` hooks are a reference wiring.
