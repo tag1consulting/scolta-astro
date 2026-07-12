@@ -2,42 +2,7 @@
 
 ## [Unreleased]
 
-### Added
-
-- **Exposed `ScoltaTracker`** — the debounced rebuild-on-content-change helper
-  the `autoRebuild` / `autoRebuildDelay` config knobs configure, matching
-  scolta-next. `touch(key)` records a change and schedules a single debounced
-  rebuild that reuses the token cache (only changed pages re-tokenize);
-  `createScoltaTracker(config)` wires the default `rebuild` to this package's
-  `buildIndex` (`BuildIntent.fresh`, no force), overridable via an explicit
-  `rebuild`. Wire `touch()` to your content events under server/SSR output;
-  static `astro build` / serverless deploys rebuild via CI/webhook. Previously
-  the `autoRebuild`/`autoRebuildDelay` knobs were declared but read by nothing —
-  and the README's "same `ScoltaTracker` pattern as scolta-next" claim was
-  untrue without the helper actually present.
-
-- **Pack-content regression guard (`npm run check:pack`).** A new
-  `scripts/check-pack-content.mjs` runs `npm pack --dry-run --json` and asserts
-  every packed path falls under the allowlist of prefixes *derived from this
-  package's own `files` field* (`dist`, `ScoltaSearch.astro`, `README.md`,
-  `CHANGELOG.md`, `LICENSE`, plus npm's always-included `package.json`) — never
-  a hardcoded generic list. Anything outside fails the build with the leaked
-  path printed and a pointer to the filter (package.json's `files`). It also
-  caps the unpacked size at ~2x the measured good artifact (193,084 bytes →
-  400,000-byte cap) to catch the bundled-fixture / stray-binary / 13 MB-zip
-  class of mistake (cf. the scolta-wp 13 MB incident and WP.org dist-cruft
-  flags). Wired into `.github/workflows/ci.yml` after the build step so dist/
-  exists for the dry-run.
-
-- **The release workflow now runs the publish-surface guards before
-  `npm publish` (`.github/workflows/release.yml`).** `check:publish` (publint +
-  are-the-types-wrong) and `check:pack` (pack-content allowlist + size cap)
-  gated only `ci.yml` on PRs, never the release workflow that actually
-  publishes — so a tagged commit could ship a tarball the PR gate would have
-  rejected. Both now run after `build`/`test` and before `npm publish`, gating
-  the published tarball the same way CI gates PRs.
-
-## [1.0.0] - 2026-06-12
+## [1.0.0] - 2026-07-10
 
 First published release.
 
@@ -56,9 +21,9 @@ First published release.
   / `SCOLTA_AI_BASE_URL` environment overrides. The resolved config + API are
   constructed once per project root (memoized above the precedence
   primitive), not once per request.
-- Default the AI service to the auto-provisioning `AmazeeAiService` when the
-  resolved provider is `amazee` (free LiteLLM trial, no key required), backed by
-  a filesystem credential store under the state dir.
+- Default the AI service to the auto-configuring `AmazeeAiService` when the
+  resolved provider is `amazee` (managed LiteLLM endpoint via Amazee.ai, no key
+  required), backed by a filesystem credential store under the state dir.
 - **The health route returns status-only by default.**
   `GET /api/scolta/v1/health` answers HTTP 200 with
   `{"status": "ok"|"degraded"}`, computed from the full report so degradation
@@ -67,6 +32,14 @@ First published release.
   there is no user model in a headless stack, so detail is config-gated rather
   than auth-gated. Matches the status-only anonymous shape of the PHP-family
   and Django adapters.
+- **Exposed `ScoltaTracker`** — the debounced rebuild-on-content-change helper
+  the `autoRebuild` / `autoRebuildDelay` config knobs configure, matching
+  scolta-next. `touch(key)` records a change and schedules a single debounced
+  rebuild that reuses the token cache (only changed pages re-tokenize);
+  `createScoltaTracker(config)` wires the default `rebuild` to this package's
+  `buildIndex` (`BuildIntent.fresh`, no force), overridable via an explicit
+  `rebuild`. Wire `touch()` to your content events under server/SSR output;
+  static `astro build` / serverless deploys rebuild via CI/webhook.
 - **Dual-format packaging done right for an Astro integration.** `.`,
   `./core` and `./build` resolve their own types per condition (`.d.cts` for
   `require`), with `typesVersions` for node10-style subpath resolution — while
@@ -80,7 +53,26 @@ First published release.
   end-to-end CJS run additionally needs the `scolta` binding >= 1.0.1 (its
   1.0.0 CJS entry crashes at require) and states that precondition.
 - `bin` entry normalized (`dist/cli.js`, no `./` prefix) so the first publish
-  is free of npm's "script name was cleaned" warning.
+  avoids npm's "script name was cleaned" warning.
+- **Pack-content regression guard (`npm run check:pack`).** A new
+  `scripts/check-pack-content.mjs` runs `npm pack --dry-run --json` and asserts
+  every packed path falls under the allowlist of prefixes *derived from this
+  package's own `files` field* (`dist`, `ScoltaSearch.astro`, `README.md`,
+  `CHANGELOG.md`, `LICENSE`, plus npm's always-included `package.json`) — never
+  a hardcoded generic list. Anything outside fails the build with the leaked
+  path printed and a pointer to the filter (package.json's `files`). It also
+  caps the unpacked size at ~2x the measured good artifact (193,084 bytes →
+  400,000-byte cap) to catch the bundled-fixture / stray-binary / 13 MB-zip
+  class of mistake (cf. the scolta-wp 13 MB incident and WP.org dist-cruft
+  flags). Wired into `.github/workflows/ci.yml` after the build step so dist/
+  exists for the dry-run.
+- **The release workflow runs the publish-surface guards before
+  `npm publish` (`.github/workflows/release.yml`).** `check:publish` (publint +
+  are-the-types-wrong) and `check:pack` (pack-content allowlist + size cap)
+  gated only `ci.yml` on PRs, never the release workflow that actually
+  publishes — so a tagged commit could ship a tarball the PR gate would have
+  rejected. Both now run after `build`/`test` and before `npm publish`, gating
+  the published tarball the same way CI gates PRs.
 - **Verification:** widget-mount smoke test through Astro's container API
   (renders `<ScoltaSearch />`, executes the inline bootstrap under jsdom,
   asserts container + tags + `window.scolta`); `check:publish` (publint +
