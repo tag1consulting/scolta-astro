@@ -62,6 +62,34 @@ Route handlers resolve config per request, lowest to highest precedence:
 3. the `SCOLTA_API_KEY` / `SCOLTA_AI_PROVIDER` / `SCOLTA_AI_MODEL` /
    `SCOLTA_AI_BASE_URL` environment variables.
 
+## Selecting an AI provider is always manual
+
+Scolta ships with **no AI provider selected**. `ai_provider` (or
+`SCOLTA_AI_PROVIDER`) is empty until you set it, and while it is empty AI
+features are simply off: search works, no provider is assumed, and Anthropic in
+particular is not silently assumed. There is no default anywhere.
+
+This adapter has no admin UI, so **setting `ai_provider` in code or env is the
+manual opt-in**. It is a going-forward rule: a deployment that already sets a
+provider keeps working exactly as before.
+
+**Amazee.ai is never enabled on its own.** Setting `ai_provider = "amazee"` is
+what permits the Amazee-backed AI service to establish the free LiteLLM demo
+connection on first use — an explicit choice you wrote down. With the provider
+unset or set to anything else, no credential is provisioned and no outbound
+Amazee call is made, on any request path. First-use provisioning is idempotent,
+and an explicit `SCOLTA_API_KEY` always wins and suppresses Amazee entirely.
+
+Amazee support is email-only, mirroring amazee.ai's own `ai_provider_amazeeio`
+module: a connection is either the free demo (no email, no account) or an
+amazee.ai account attached by signing in with its email address. There is no
+paste-your-API-key path.
+
+Because there is no admin UI here, there is no in-app recovery when a
+connection's credit runs out: AI degrades and the health endpoint reports it.
+Re-authing is an explicit ops action — set your own credentials, or run the
+provisioning path again after connecting an account.
+
 ## Health endpoint
 
 `GET /api/scolta/v1/health` returns `{"status": "ok"|"degraded"}` — enough for
