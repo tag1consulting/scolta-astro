@@ -1,4 +1,4 @@
-# MAINTAINING — scolta-astro
+# Maintaining scolta-astro
 
 The Astro integration over the `scolta` binding. Publishes to npm.
 
@@ -17,7 +17,7 @@ directory resolves it. The main entry is the integration (default export) plus n
 framework-free build utils are also at `scolta-astro/core` and `scolta-astro/build`, and the route
 modules ship at `scolta-astro/routes/*`.
 
-**CI checks.** One `test` job, and unlike the other npm adapters it runs on **Node 22 only**: this
+**CI checks.** One `test` job, and unlike the other npm adapters it runs on Node 22 only: this
 package's own engines floor is 20, but the mount suite runs the Astro devDependency, whose engines
 require 22.12 or newer. The job runs `npm run build`, `npm test` (vitest twice, the second pass under
 `vitest.mount.config.ts`), `npm run typecheck`, `npm run lint`, `npm run check:publish` and
